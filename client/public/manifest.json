@@ -1,0 +1,17 @@
+{
+    "name": "Hệ thống Quản lý Ký túc xá - HUST",
+    "short_name": "KTX HUST",
+    "description": "Hệ thống quản lý sinh viên nội trú Đại học Bách Khoa Hà Nội",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#B22222",
+    "lang": "vi",
+    "icons": [
+        {
+            "src": "client/public/favicon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}
