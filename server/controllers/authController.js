@@ -2,15 +2,15 @@ const jwt = require('jsonwebtoken');
 const Account = require('../models/Account');
 const Student = require('../models/Student');
 
-// Generate JWT
+// ─── Generate JWT ─────────────────────────────────────────────
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
         expiresIn: process.env.JWT_EXPIRES_IN || '7d',
     });
 };
 
-// @route   POST /api/auth/register
-// @access  Public
+// ─── @route   POST /api/auth/register ─────────────────────────
+// ─── @access  Public
 const register = async (req, res) => {
     try {
         const { student_code, fullname, email, password, date_of_birth, gender, phone } = req.body;
@@ -46,7 +46,8 @@ const register = async (req, res) => {
                 id: account._id,
                 username: account.username,
                 role: account.role,
-                student_id: student._id,
+                student: student,         // full student object, consistent with login response
+                student_id: student._id,  // kept for backwards compat
                 fullname: student.fullname,
             },
         });
@@ -55,8 +56,8 @@ const register = async (req, res) => {
     }
 };
 
-// @route   POST /api/auth/login
-// @access  Public
+// ─── @route   POST /api/auth/login ────────────────────────────
+// ─── @access  Public
 const login = async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -82,10 +83,15 @@ const login = async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid credentials.' });
         }
 
-        // Fetch student profile if student role
+        // Fetch student profile if student role — populate current_contract so frontend can use room info
         let studentProfile = null;
         if (account.role === 'student' && account.student_id) {
-            studentProfile = await Student.findById(account.student_id).select('-__v');
+            studentProfile = await Student.findById(account.student_id)
+                .select('-__v')
+                .populate({
+                    path: 'current_contract',
+                    populate: { path: 'room_id', populate: { path: 'building_id' } },
+                });
         }
 
         const token = generateToken(account._id);
@@ -106,8 +112,8 @@ const login = async (req, res) => {
     }
 };
 
-// @route   GET /api/auth/me
-// @access  Private
+// ─── @route   GET /api/auth/me ────────────────────────────────
+// ─── @access  Private
 const getMe = async (req, res) => {
     try {
         const account = await Account.findById(req.user._id);
@@ -125,8 +131,8 @@ const getMe = async (req, res) => {
     }
 };
 
-// @route   PATCH /api/auth/change-password
-// @access  Private
+// ─── @route   PATCH /api/auth/change-password ─────────────────
+// ─── @access  Private
 const changePassword = async (req, res) => {
     try {
         const { old_password, new_password } = req.body;

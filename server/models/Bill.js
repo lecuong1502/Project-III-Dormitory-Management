@@ -23,11 +23,11 @@ const billSchema = new mongoose.Schema(
         electricity_fee: {
             type: Number,
             default: 0,
-            },
+        },
         water_fee: {
             type: Number,
             default: 0,
-            },
+        },
         service_fee: {
             type: Number,
             default: 0,

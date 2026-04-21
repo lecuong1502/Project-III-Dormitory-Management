@@ -5,8 +5,8 @@ const Bill = require('../models/Bill');
 const Contract = require('../models/Contract');
 const Student = require('../models/Student');
 
-// @route   GET /api/dashboard/stats
-// @access  Private (Admin)
+// ─── @route   GET /api/dashboard/stats ───────────────────────
+// ─── @access  Private (Admin)
 const getDashboardStats = async (req, res) => {
     try {
         // Run all aggregation queries in parallel for performance

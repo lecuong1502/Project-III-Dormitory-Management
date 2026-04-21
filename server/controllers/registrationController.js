@@ -4,8 +4,8 @@ const Student = require('../models/Student');
 const Contract = require('../models/Contract');
 const Notification = require('../models/Notification');
 
-// @route   GET /api/registrations
-// @access  Private (Admin)
+// ─── @route   GET /api/registrations ─────────────────────────
+// ─── @access  Private (Admin)
 const getAllRegistrations = async (req, res) => {
     try {
         const { status } = req.query;
@@ -23,8 +23,8 @@ const getAllRegistrations = async (req, res) => {
     }
 };
 
-// @route   GET /api/registrations/my
-// @access  Private (Student)
+// ─── @route   GET /api/registrations/my ──────────────────────
+// ─── @access  Private (Student)
 const getMyRegistration = async (req, res) => {
     try {
         const student = await Student.findById(req.user.student_id);
@@ -40,8 +40,8 @@ const getMyRegistration = async (req, res) => {
     }
 };
 
-// @route   POST /api/registrations
-// @access  Private (Student)
+// ─── @route   POST /api/registrations ────────────────────────
+// ─── @access  Private (Student)
 const submitRegistration = async (req, res) => {
     try {
         const student = await Student.findById(req.user.student_id);
@@ -73,8 +73,8 @@ const submitRegistration = async (req, res) => {
     }
 };
 
-// @route   PATCH /api/registrations/:id/approve
-// @access  Private (Admin)
+// ─── @route   PATCH /api/registrations/:id/approve ───────────
+// ─── @access  Private (Admin)
 const approveRegistration = async (req, res) => {
     try {
         const { room_id, bed_id } = req.body;
@@ -134,8 +134,8 @@ const approveRegistration = async (req, res) => {
     }
 };
 
-// @route   PATCH /api/registrations/:id/reject
-// @access  Private (Admin)
+// ─── @route   PATCH /api/registrations/:id/reject ────────────
+// ─── @access  Private (Admin)
 const rejectRegistration = async (req, res) => {
     try {
         const { rejection_reason } = req.body;

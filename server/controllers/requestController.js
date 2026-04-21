@@ -2,8 +2,8 @@ const Request = require('../models/Request');
 const Student = require('../models/Student');
 const Notification = require('../models/Notification');
 
-// @route   GET /api/requests
-// @access  Private (Admin)
+// ─── @route   GET /api/requests ───────────────────────────────
+// ─── @access  Private (Admin)
 const getAllRequests = async (req, res) => {
     try {
         const { status, category } = req.query;
@@ -21,8 +21,8 @@ const getAllRequests = async (req, res) => {
     }
 };
 
-// @route   GET /api/requests/my
-// @access  Private (Student)
+// ─── @route   GET /api/requests/my ───────────────────────────
+// ─── @access  Private (Student)
 const getMyRequests = async (req, res) => {
     try {
         const student = await Student.findById(req.user.student_id);
@@ -35,8 +35,8 @@ const getMyRequests = async (req, res) => {
     }
 };
 
-// @route   POST /api/requests
-// @access  Private (Student)
+// ─── @route   POST /api/requests ─────────────────────────────
+// ─── @access  Private (Student)
 const createRequest = async (req, res) => {
     try {
         const student = await Student.findById(req.user.student_id);
@@ -62,8 +62,8 @@ const createRequest = async (req, res) => {
     }
 };
 
-// @route   PATCH /api/requests/:id/status
-// @access  Private (Admin)
+// ─── @route   PATCH /api/requests/:id/status ─────────────────
+// ─── @access  Private (Admin)
 const updateRequestStatus = async (req, res) => {
     try {
         const { status, admin_response } = req.body;

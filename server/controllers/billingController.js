@@ -5,8 +5,8 @@ const Room = require('../models/Room');
 const Notification = require('../models/Notification');
 const generateMonthlyInvoices = require('../utils/generateInvoices');
 
-// @route   GET /api/billing/invoices
-// @access  Private (Admin)
+// ─── @route   GET /api/billing/invoices ──────────────────────
+// ─── @access  Private (Admin)
 const getAllInvoices = async (req, res) => {
     try {
         const { status, month } = req.query;
@@ -25,8 +25,8 @@ const getAllInvoices = async (req, res) => {
     }
 };
 
-// @route   GET /api/billing/invoices/my
-// @access  Private (Student)
+// ─── @route   GET /api/billing/invoices/my ───────────────────
+// ─── @access  Private (Student)
 const getMyInvoices = async (req, res) => {
     try {
         const student = await Student.findById(req.user.student_id);
@@ -42,8 +42,8 @@ const getMyInvoices = async (req, res) => {
     }
 };
 
-// @route   POST /api/billing/generate
-// @access  Private (Admin)
+// ─── @route   POST /api/billing/generate ─────────────────────
+// ─── @access  Private (Admin)
 const generateInvoices = async (req, res) => {
     try {
         const { month } = req.body; // e.g. "2026-03"
@@ -56,8 +56,8 @@ const generateInvoices = async (req, res) => {
     }
 };
 
-// @route   PATCH /api/billing/:id/submit-proof
-// @access  Private (Student)
+// ─── @route   PATCH /api/billing/:id/submit-proof ────────────
+// ─── @access  Private (Student)
 const submitPaymentProof = async (req, res) => {
     try {
         const invoice = await Bill.findById(req.params.id);
@@ -86,8 +86,8 @@ const submitPaymentProof = async (req, res) => {
     }
 };
 
-// @route   PATCH /api/billing/:id/confirm
-// @access  Private (Admin)
+// ─── @route   PATCH /api/billing/:id/confirm ─────────────────
+// ─── @access  Private (Admin)
 const confirmPayment = async (req, res) => {
     try {
         const invoice = await Bill.findById(req.params.id);
@@ -114,8 +114,8 @@ const confirmPayment = async (req, res) => {
     }
 };
 
-// @route   PATCH /api/billing/:id/reject
-// @access  Private (Admin)
+// ─── @route   PATCH /api/billing/:id/reject ──────────────────
+// ─── @access  Private (Admin)
 const rejectPayment = async (req, res) => {
     try {
         const { rejection_reason } = req.body;

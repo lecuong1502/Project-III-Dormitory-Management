@@ -1,8 +1,8 @@
 const Notification = require('../models/Notification');
 const Student = require('../models/Student');
 
-// @route   GET /api/notifications/my
-// @access  Private (Student)
+// ─── @route   GET /api/notifications/my ──────────────────────
+// ─── @access  Private (Student)
 const getMyNotifications = async (req, res) => {
     try {
         const student = await Student.findById(req.user.student_id);
@@ -19,8 +19,8 @@ const getMyNotifications = async (req, res) => {
     }
 };
 
-// @route   GET /api/notifications
-// @access  Private (Admin)
+// ─── @route   GET /api/notifications ─────────────────────────
+// ─── @access  Private (Admin)
 const getAllNotifications = async (req, res) => {
     try {
         const notifications = await Notification.find()
@@ -34,8 +34,8 @@ const getAllNotifications = async (req, res) => {
     }
 };
 
-// @route   POST /api/notifications
-// @access  Private (Admin)
+// ─── @route   POST /api/notifications ────────────────────────
+// ─── @access  Private (Admin)
 const sendNotification = async (req, res) => {
     try {
         const { title, content, student_id } = req.body; // student_id = null for broadcast
@@ -74,8 +74,8 @@ const sendNotification = async (req, res) => {
     }
 };
 
-// @route   PATCH /api/notifications/:id/read
-// @access  Private (Student)
+// ─── @route   PATCH /api/notifications/:id/read ──────────────
+// ─── @access  Private (Student)
 const markAsRead = async (req, res) => {
     try {
         const notification = await Notification.findByIdAndUpdate(
@@ -90,8 +90,8 @@ const markAsRead = async (req, res) => {
     }
 };
 
-// @route   PATCH /api/notifications/mark-all-read
-// @access  Private (Student)
+// ─── @route   PATCH /api/notifications/mark-all-read ─────────
+// ─── @access  Private (Student)
 const markAllAsRead = async (req, res) => {
     try {
         const student = await Student.findById(req.user.student_id);

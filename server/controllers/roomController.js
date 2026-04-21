@@ -1,8 +1,8 @@
 const Room = require('../models/Room');
 const Building = require('../models/Building');
 
-// @route   GET /api/rooms
-// @access  Private (Admin)
+// ─── @route   GET /api/rooms ──────────────────────────────────
+// ─── @access  Private (Admin)
 const getAllRooms = async (req, res) => {
     try {
         const { building_id, status, room_type } = req.query;
@@ -21,8 +21,8 @@ const getAllRooms = async (req, res) => {
     }
 };
 
-// @route   GET /api/rooms/:id
-// @access  Private
+// ─── @route   GET /api/rooms/:id ─────────────────────────────
+// ─── @access  Private
 const getRoomById = async (req, res) => {
     try {
         const room = await Room.findById(req.params.id)
@@ -37,8 +37,8 @@ const getRoomById = async (req, res) => {
     }
 };
 
-// @route   POST /api/rooms
-// @access  Private (Admin)
+// ─── @route   POST /api/rooms ─────────────────────────────────
+// ─── @access  Private (Admin)
 const createRoom = async (req, res) => {
     try {
         const { room_number, building_id, room_type, price_per_month } = req.body;
@@ -67,8 +67,8 @@ const createRoom = async (req, res) => {
     }
 };
 
-// @route   PATCH /api/rooms/:id
-// @access  Private (Admin)
+// ─── @route   PATCH /api/rooms/:id ───────────────────────────
+// ─── @access  Private (Admin)
 const updateRoom = async (req, res) => {
     try {
         const room = await Room.findByIdAndUpdate(req.params.id, req.body, {
@@ -82,8 +82,8 @@ const updateRoom = async (req, res) => {
     }
 };
 
-// @route   DELETE /api/rooms/:id
-// @access  Private (Admin)
+// ─── @route   DELETE /api/rooms/:id ──────────────────────────
+// ─── @access  Private (Admin)
 const deleteRoom = async (req, res) => {
     try {
         const room = await Room.findById(req.params.id);
@@ -103,8 +103,8 @@ const deleteRoom = async (req, res) => {
     }
 };
 
-// @route   PATCH /api/rooms/:id/beds/:bedId
-// @access  Private (Admin)
+// ─── @route   PATCH /api/rooms/:id/beds/:bedId ───────────────
+// ─── @access  Private (Admin)
 const updateBedStatus = async (req, res) => {
     try {
         const { status } = req.body;
@@ -131,8 +131,8 @@ const updateBedStatus = async (req, res) => {
     }
 };
 
-// @route   GET /api/rooms/buildings
-// access  Private (Admin)
+// ─── @route   GET /api/rooms/buildings ───────────────────────
+// ─── @access  Private (Admin)
 const getAllBuildings = async (req, res) => {
     try {
         const buildings = await Building.find().sort({ name: 1 });
@@ -142,8 +142,8 @@ const getAllBuildings = async (req, res) => {
     }
 };
 
-// @route   POST /api/rooms/buildings
-// @access  Private (Admin)
+// ─── @route   POST /api/rooms/buildings ──────────────────────
+// ─── @access  Private (Admin)
 const createBuilding = async (req, res) => {
     try {
         const building = await Building.create(req.body);
