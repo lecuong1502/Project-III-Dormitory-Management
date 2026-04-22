@@ -73,7 +73,7 @@ const RoomInfo = () => {
 
                 {/* My bed */}
                 <Card title="Giường của tôi">
-                    {room.beds?.filter(b => b.student_id?._id === student?._id || b.student_id === student?._id).map(bed => (
+                    {room.beds?.filter(b => b.student_id?._id?.toString() === student?._id?.toString() || b.student_id?.toString() === student?._id?.toString()).map(bed => (
                         <div key={bed._id} style={{
                             background: 'var(--primary-light)', borderRadius: 10,
                             padding: 16, display: 'flex', alignItems: 'center', gap: 12,

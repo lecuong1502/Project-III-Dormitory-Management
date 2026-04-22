@@ -106,7 +106,7 @@ const AdminBilling = () => {
                                 <td style={{ padding: 12 }}><StatusBadge status={inv.status} /></td>
                                 <td style={{ padding: 12 }}>
                                     {inv.payment_proof_url ? (
-                                        <a href={`http://localhost:5000${inv.payment_proof_url}`} target="_blank" rel="noreferrer"
+                                        <a href={`${new URL(import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api').origin}${inv.payment_proof_url}`} target="_blank" rel="noreferrer"
                                             style={{ color: 'var(--primary)', fontSize: 13, fontWeight: 600 }}>
                                             <Eye size={13} style={{ verticalAlign: 'middle' }} /> Xem
                                         </a>

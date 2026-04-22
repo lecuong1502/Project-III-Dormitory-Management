@@ -109,8 +109,9 @@ const StudentHome = () => {
                             )}
                             <div>
                                 <div style={{ fontWeight: n.is_read ? 400 : 700, fontSize: 14 }}>{n.title}</div>
-                                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}
-                                    dangerouslySetInnerHTML={{ __html: n.content.slice(0, 60) + '...' }} />
+                                <div style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>
+                                    {n.content.length > 60 ? n.content.slice(0, 60) + '...' : n.content}
+                                 </div>
                             </div>
                         </div>
                     ))}
