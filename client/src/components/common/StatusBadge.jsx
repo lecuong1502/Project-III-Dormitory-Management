@@ -1,4 +1,4 @@
-import { } from '../../utils/helpers';
+import { statusConfig } from '../../utils/helpers';
 
 const StatusBadge = ({ status }) => {
     const cfg = statusConfig[status] || { label: status, color: '#6b7280', bg: '#f3f4f6' };

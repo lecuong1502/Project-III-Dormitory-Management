@@ -19,6 +19,9 @@ const AdminRooms = () => {
     const [addRoomModal, setAddRoomModal] = useState(false);
     const [form, setForm] = useState({ room_number: '', building_id: '', room_type: '4-person', price_per_month: 400000 });
     const [submitting, setSubmitting] = useState(false);
+    const [addBuildingModal, setAddBuildingModal] = useState(false);
+    const [buildingForm, setBuildingForm] = useState({ name: '', address: '' });
+    const [buildingSubmitting, setBuildingSubmitting] = useState(false);
 
     const fetchAll = async () => {
         const [b, r] = await Promise.all([roomService.getBuildings(), roomService.getRooms()]);
@@ -31,6 +34,22 @@ const AdminRooms = () => {
     useEffect(() => { fetchAll(); }, []);
 
     const filteredRooms = rooms.filter(r => r.building_id?._id === activeBuilding || r.building_id === activeBuilding);
+
+    const handleAddBuilding = async () => {
+        if (!buildingForm.name.trim()) return toast.error('Vui lòng nhập tên tòa nhà.');
+        setBuildingSubmitting(true);
+        try {
+            await roomService.createBuilding(buildingForm);
+            toast.success('Đã thêm tòa nhà mới!');
+            setAddBuildingModal(false);
+            setBuildingForm({ name: '', address: '' });
+            fetchAll();
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Thất bại.');
+        } finally {
+            setBuildingSubmitting(false);
+        }
+    };
 
     const handleAddRoom = async () => {
         if (!form.room_number || !form.building_id) return toast.error('Vui lòng nhập đầy đủ thông tin.');
@@ -61,9 +80,14 @@ const AdminRooms = () => {
         <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                 <h1 style={{ fontSize: 22, fontWeight: 700 }}>Sơ đồ phòng</h1>
-                <Button onClick={() => setAddRoomModal(true)} style={{ display: 'flex', gap: 6 }}>
-                    <Plus size={15} /> Thêm phòng mới
-                </Button>
+                <div style={{ display: 'flex', gap: 10 }}>
+                    <Button variant="outline" onClick={() => setAddBuildingModal(true)} style={{ display: 'flex', gap: 6 }}>
+                        <Plus size={15} /> Thêm tòa nhà
+                    </Button>
+                    <Button onClick={() => setAddRoomModal(true)} style={{ display: 'flex', gap: 6 }}>
+                        <Plus size={15} /> Thêm phòng mới
+                    </Button>
+                </div>
             </div>
 
             {/* Building tabs */}
@@ -210,6 +234,37 @@ const AdminRooms = () => {
                 <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
                     <Button variant="ghost" onClick={() => setAddRoomModal(false)}>Hủy</Button>
                     <Button loading={submitting} onClick={handleAddRoom}><Plus size={14} /> Thêm phòng</Button>
+                </div>
+            </Modal>
+
+            <Modal open={addBuildingModal} onClose={() => setAddBuildingModal(false)} title="Thêm tòa nhà mới">
+                <div style={{ marginBottom: 16 }}>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+                        Tên tòa nhà *
+                    </label>
+                    <input
+                        value={buildingForm.name}
+                        onChange={e => setBuildingForm({ ...buildingForm, name: e.target.value })}
+                        placeholder="VD: Tòa A1, Tòa B2..."
+                        style={{ width: '100%', padding: '9px 12px', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: 14 }}
+                    />
+                </div>
+                <div style={{ marginBottom: 20 }}>
+                    <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 6 }}>
+                        Địa chỉ
+                    </label>
+                    <input
+                        value={buildingForm.address}
+                        onChange={e => setBuildingForm({ ...buildingForm, address: e.target.value })}
+                        placeholder="VD: Khu A - KTX Đại học Bách Khoa HN"
+                        style={{ width: '100%', padding: '9px 12px', border: '1.5px solid var(--border)', borderRadius: 8, fontSize: 14 }}
+                    />
+                </div>
+                <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+                    <Button variant="ghost" onClick={() => setAddBuildingModal(false)}>Hủy</Button>
+                    <Button loading={buildingSubmitting} onClick={handleAddBuilding}>
+                        <Plus size={14} /> Thêm tòa nhà
+                    </Button>
                 </div>
             </Modal>
         </div>

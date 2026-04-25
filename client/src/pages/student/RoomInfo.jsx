@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { roomService } from '../../services/roomService';
 import Card from '../../components/common/Card';
@@ -10,28 +10,35 @@ const RoomInfo = () => {
     const { user, refreshUser } = useAuth();
     const [room, setRoom] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [refreshed, setRefreshed] = useState(false);
     const student = user?.student;
 
+    const contractRoomId = useMemo(() => {
+        const student = user?.student;
+        return String(
+            student?.current_contract?.room_id?._id ||
+            student?.current_contract?.room_id ||
+            ''
+        );
+    }, [user?.student?._id, user?.student?.current_contract]);
+
     useEffect(() => {
-        // Always refresh user first to get latest current_contract
-        refreshUser().then(() => { }).catch(() => { });
+        refreshUser().finally(() => setRefreshed(true));
     }, []);
 
     useEffect(() => {
-        const contractRoomId =
-            student?.current_contract?.room_id?._id ||
-            student?.current_contract?.room_id ||
-            null;
+        if (!refreshed) return;
 
-        if (contractRoomId) {
+        if (contractRoomId && contractRoomId !== 'null' && contractRoomId !== '') {
+            setLoading(true);
             roomService.getRoomById(contractRoomId)
                 .then(r => setRoom(r.data.data))
-                .catch(() => { })
+                .catch(() => {})
                 .finally(() => setLoading(false));
         } else {
             setLoading(false);
         }
-    }, [student?.current_contract]);
+    }, [contractRoomId, refreshed]);
 
     if (loading) return <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}><Spinner /></div>;
 

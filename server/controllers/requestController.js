@@ -1,6 +1,8 @@
 const Request = require('../models/Request');
 const Student = require('../models/Student');
 const Notification = require('../models/Notification');
+const Room = require('../models/Room');
+const Contract = require('../models/Contract');
 
 // ─── @route   GET /api/requests ───────────────────────────────
 // ─── @access  Private (Admin)
@@ -66,10 +68,10 @@ const createRequest = async (req, res) => {
 // ─── @access  Private (Admin)
 const updateRequestStatus = async (req, res) => {
     try {
-        const { status, admin_response } = req.body;
+        const { status, admin_response, new_room_id, new_bed_id } = req.body;
         const validTransitions = { new: ['processing'], processing: ['completed', 'rejected'] };
 
-        const request = await Request.findById(req.params.id);
+        const request = await Request.findById(req.params.id).populate('student_id');
         if (!request) return res.status(404).json({ success: false, message: 'Request not found.' });
 
         const allowed = validTransitions[request.status];
@@ -80,6 +82,94 @@ const updateRequestStatus = async (req, res) => {
             });
         }
 
+        // ── Xử lý chuyển phòng khi hoàn tất ──────────────────────────
+        if (status === 'completed' && request.category === 'room_transfer') {
+            if (!new_room_id || !new_bed_id) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Vui lòng cung cấp new_room_id và new_bed_id để chuyển phòng.',
+                });
+            }
+
+            const student = request.student_id;
+
+            // Lấy contract hiện tại
+            const oldContract = await Contract.findById(student.current_contract);
+            if (!oldContract) {
+                return res.status(400).json({ success: false, message: 'Sinh viên không có hợp đồng hiện tại.' });
+            }
+
+            // Lấy phòng cũ → giải phóng giường cũ
+            const oldRoom = await Room.findById(oldContract.room_id);
+            if (oldRoom) {
+                const oldBed = oldRoom.beds.id(oldContract.bed_id);
+                if (oldBed) {
+                    oldBed.status = 'available';
+                    oldBed.student_id = null;
+                }
+                oldRoom.updateRoomStatus();
+                await oldRoom.save();
+            }
+
+            // Lấy phòng mới → gán giường mới
+            const newRoom = await Room.findById(new_room_id);
+            if (!newRoom) {
+                return res.status(404).json({ success: false, message: 'Phòng mới không tìm thấy.' });
+            }
+            const newBed = newRoom.beds.id(new_bed_id);
+            if (!newBed || newBed.status !== 'available') {
+                return res.status(400).json({ success: false, message: 'Giường mới không còn trống.' });
+            }
+            newBed.status = 'occupied';
+            newBed.student_id = student._id;
+            newRoom.updateRoomStatus();
+            await newRoom.save();
+
+            // Cập nhật contract cũ → tạo contract mới
+            oldContract.status = 'terminated';
+            oldContract.end_date = new Date();
+            await oldContract.save();
+
+            const newContract = await Contract.create({
+                student_id: student._id,
+                room_id: newRoom._id,
+                bed_id: newBed._id,
+                start_date: new Date(),
+                status: 'active',
+            });
+
+            // Cập nhật student
+            await Student.findByIdAndUpdate(student._id, { current_contract: newContract._id });
+        }
+
+        // ── Xử lý trả phòng khi hoàn tất ─────────────────────────────
+        if (status === 'completed' && request.category === 'checkout') {
+            const student = request.student_id;
+            const oldContract = await Contract.findById(student.current_contract);
+
+            if (oldContract) {
+                // Giải phóng giường
+                const oldRoom = await Room.findById(oldContract.room_id);
+                if (oldRoom) {
+                    const oldBed = oldRoom.beds.id(oldContract.bed_id);
+                    if (oldBed) {
+                        oldBed.status = 'available';
+                        oldBed.student_id = null;
+                    }
+                    oldRoom.updateRoomStatus();
+                    await oldRoom.save();
+                }
+
+                oldContract.status = 'terminated';
+                oldContract.end_date = new Date();
+                await oldContract.save();
+            }
+
+            // Xóa contract khỏi student
+            await Student.findByIdAndUpdate(student._id, { current_contract: null });
+        }
+
+        // ── Cập nhật request ──────────────────────────────────────────
         request.status = status;
         request.admin_response = admin_response || request.admin_response;
         request.processed_by = req.user._id;
@@ -88,13 +178,13 @@ const updateRequestStatus = async (req, res) => {
         }
         await request.save();
 
-        // Notify student when request is resolved
+        // Thông báo cho sinh viên
         if (status === 'completed' || status === 'rejected') {
             const statusLabel = status === 'completed' ? 'hoàn thành' : 'bị từ chối';
             await Notification.create({
                 title: `Yêu cầu hỗ trợ đã được ${statusLabel}`,
                 content: `Yêu cầu "${request.category}" của bạn đã được ${statusLabel}. ${admin_response ? 'Phản hồi: ' + admin_response : ''}`,
-                student_id: request.student_id,
+                student_id: request.student_id._id || request.student_id,
                 created_by: req.user._id,
             });
         }
